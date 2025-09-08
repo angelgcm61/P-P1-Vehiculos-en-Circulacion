@@ -1,0 +1,624 @@
+<p>La base de datos de la inegi nos proprciona la siguiente información:</p>
+<ul>
+<li>PROD_EST: Es la estadisitica de Vehiculos de motor registrados en circulacion de forma anual.</li>
+<li>COBERTURA: La area geografica en la que se basan las entidades, marcadas como Municipio</li>
+<li>ANIO: Periodo de tiempo en el cual se realizaron los registros, marcado como 2024</li>
+<li>ID_ENTIDAD: Clave de la entidad federativa de México, va del 1 al 32 respresentando cada estado de México.</li>
+<li>ID_MUNICIPIO: Clave del municipio con respecto a la Entidad federativa que pertenece, representados por numeros representando cada ciudad dentro del estado.</li>
+<li>AUTO_OFICIAL: Autos que cuantan con hasta 7 asientos son utilizados por los organismos gubernamentales en el municipio.</li>
+<li>AUTO_PUBLICO: Autos que cuantan con hasta 7 asientos son utilizados como servicios para el traslado de personas, bienes o mercancia en el municipio.</li>
+<li>AUTO_PARTICULAR: Autos que cuantan con hasta 7 asientos son de la propiedad de cada persona en el municipio.</li>
+<li>CAM_PAS_OFICIAL: autobuses urbanos y suburbanos, microbuses, camiones escolares, camionetas pick-up (utilizadas para el transporte de trabajadores), los vehiculos con más de 7 asientos, cuyas unidades son utilizadas por los organismos gubernamentales para satisfacer sus propios requerimientos y/o atender las necesidades de la población.</li>
+<li>CAM_PAS_PUBLICO: Autobuses urbanos y suburbanos, microbuses, camiones escolares, camionetas pick-up (utilizadas para el transporte de trabajadores), los vehiculos con más de 7 asientos, cuyas unidades son utilizadas por el publico en general como un servicio.</li>
+<li>CAM_PAS_PARTICULAR: Autobuses urbanos, microbuses, camiones escolares, camionetas pick-up (utilizadas para el transporte de trabajadores), los vehiculos con más de 7 asientos. Las unidades son destinadas al autotransporte de pasajeros o bienes por cuenta propia.</li>
+<li>CYC_CARGA_OFICIAL: Camiones de carga diseñados para el remolque que son utilizadas por los organismos gubernamentales.</li>
+<li>CYC_CARGA_PUBLICO: Camiones de carga diseñados para el remolque que son utilizadas como servicio para el traslado de bienes o mercancías.</li>
+<li>CYC_CARGA_PARTICULAR: Camiones de carga diseñados para el remolque que son destinadas al autotransporte de bienes o mercancías por cuenta propia.</li>
+<li>MOTO_OFICIAL: Vehiculos automotor de dos, tres o cuatro ruedas, utlizadas por los organmismos gubernamentales.</li>
+<li>MOTO_DE_ALQUILER: Vehiculos automotor de dos, tres o cuatro ruedas, que son utilizadas por el público en general como un servicio.</li>
+<li>MOTO_PARTICULAR: Vehiculos automotor de dos, tres o cuatro ruedas, destinadas al autotransporte de pasajeros o bienes.</li>
+<li>ESTATUS: Cambios a la información divulgada en las publicaciones estadíticas y geográficas del INEGI.</li>
+</ul>
+<p>Al analizar la base de datos, puedo notar que entre mas aumeneta los Autos particulares tambien lo haran las Motos particulares, es por esto que considero que estas variables son aptas para una regresión lineal</p>
+<pre><code>import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+datos = pd.read_csv('P1-Vehiculos-en-Circulacion.csv')
+print("Nombres de variables y datos\n", datos.head())
+print("\nTipo de datos\n", datos.dtypes)
+print("\nDimensiones totales:", datos.shape, "\n")
+
+Y_AP=datos.AUTO_PARTICULAR
+X_MP=datos.MOTO_PARTICULAR
+plt.scatter(X_MP, Y_AP)
+plt.title("Auto particular contra Moto particular")
+plt.xlabel("Moto particular")
+plt.ylabel("Auto particular")
+plt.show()
+
+print(datos.PROD_EST.value_counts())
+print(datos.COBERTURA.value_counts())
+print(datos.ANIO.value_counts())
+print(datos.ESTATUS.value_counts())
+
+datos=datos.drop(['PROD_EST'], axis=1)
+datos=datos.drop(['COBERTURA'], axis=1)
+datos=datos.drop(['ANIO'], axis=1)
+datos=datos.drop(['ESTATUS'], axis=1)
+
+datos=datos.drop(['ID_MUNICIPIO'], axis=1)
+
+print("\nNueva base de datos\n", datos.head(), "\n")
+print(datos.dtypes)
+</code></pre>
+<pre><code>Nombres de variables y datos
+                                             PROD_EST  COBERTURA  ANIO  \
+0  Vehículos de motor registrados en circulación....  Municipal  2024   
+1  Vehículos de motor registrados en circulación....  Municipal  2024   
+2  Vehículos de motor registrados en circulación....  Municipal  2024   
+3  Vehículos de motor registrados en circulación....  Municipal  2024   
+4  Vehículos de motor registrados en circulación....  Municipal  2024   
+
+   ID_ENTIDAD  ID_MUNICIPIO  AUTO_OFICIAL  AUTO_PUBLICO  AUTO_PARTICULAR  \
+0           1             1           452          4741           368872   
+1           1             2             0            36             6870   
+2           1             3             1           168            13988   
+3           1             4             2            21             2700   
+4           1             5            24           243            41830   
+
+   CAM_PAS_OFICIAL  CAM_PAS_PUBLICO  CAM_PAS_PARTICULAR  CYC_CARGA_OFICIAL  \
+0                5             2497                 619                557   
+1                0                2                  18                  6   
+2                0                7                  10                 18   
+3                0                0                   6                  7   
+4                0               46                  90                 35   
+
+   CYC_CARGA_PUBLICO  CYC_CARGA_PARTICULAR  MOTO_OFICIAL  MOTO_DE_ALQUILER  \
+0               3599                112480           299                 0   
+1                 20                  5689             2                 0   
+2                  4                 13383             9                 0   
+3                  0                  1795             0                 0   
+4                180                 17078            24                 0   
+
+   MOTO_PARTICULAR             ESTATUS  
+0            89105  Cifras Definitivas  
+1             6199  Cifras Definitivas  
+2             3776  Cifras Definitivas  
+3             2122  Cifras Definitivas  
+4            12852  Cifras Definitivas  
+
+Tipo de datos
+ PROD_EST                object
+COBERTURA               object
+ANIO                     int64
+ID_ENTIDAD               int64
+ID_MUNICIPIO             int64
+AUTO_OFICIAL             int64
+AUTO_PUBLICO             int64
+AUTO_PARTICULAR          int64
+CAM_PAS_OFICIAL          int64
+CAM_PAS_PUBLICO          int64
+CAM_PAS_PARTICULAR       int64
+CYC_CARGA_OFICIAL        int64
+CYC_CARGA_PUBLICO        int64
+CYC_CARGA_PARTICULAR     int64
+MOTO_OFICIAL             int64
+MOTO_DE_ALQUILER         int64
+MOTO_PARTICULAR          int64
+ESTATUS                 object
+dtype: object
+
+Dimensiones totales: (2478, 18) 
+
+
+
+
+</code></pre>
+<p><img src="output_1_1.png" alt="png"></p>
+<pre><code>PROD_EST
+Vehículos de motor registrados en circulación. Anual    2478
+Name: count, dtype: int64
+COBERTURA
+Municipal    2478
+Name: count, dtype: int64
+ANIO
+2024    2478
+Name: count, dtype: int64
+ESTATUS
+Cifras Definitivas    2478
+Name: count, dtype: int64
+
+Nueva base de datos
+    ID_ENTIDAD  AUTO_OFICIAL  AUTO_PUBLICO  AUTO_PARTICULAR  CAM_PAS_OFICIAL  \
+0           1           452          4741           368872                5   
+1           1             0            36             6870                0   
+2           1             1           168            13988                0   
+3           1             2            21             2700                0   
+4           1            24           243            41830                0   
+
+   CAM_PAS_PUBLICO  CAM_PAS_PARTICULAR  CYC_CARGA_OFICIAL  CYC_CARGA_PUBLICO  \
+0             2497                 619                557               3599   
+1                2                  18                  6                 20   
+2                7                  10                 18                  4   
+3                0                   6                  7                  0   
+4               46                  90                 35                180   
+
+   CYC_CARGA_PARTICULAR  MOTO_OFICIAL  MOTO_DE_ALQUILER  MOTO_PARTICULAR  
+0                112480           299                 0            89105  
+1                  5689             2                 0             6199  
+2                 13383             9                 0             3776  
+3                  1795             0                 0             2122  
+4                 17078            24                 0            12852   
+
+ID_ENTIDAD              int64
+AUTO_OFICIAL            int64
+AUTO_PUBLICO            int64
+AUTO_PARTICULAR         int64
+CAM_PAS_OFICIAL         int64
+CAM_PAS_PUBLICO         int64
+CAM_PAS_PARTICULAR      int64
+CYC_CARGA_OFICIAL       int64
+CYC_CARGA_PUBLICO       int64
+CYC_CARGA_PARTICULAR    int64
+MOTO_OFICIAL            int64
+MOTO_DE_ALQUILER        int64
+MOTO_PARTICULAR         int64
+dtype: object
+</code></pre>
+<p>Importamos la base de datos y analizamos y comparamos si las variables que dijimos se pudiesen hacer en una regresion lineal y yo considero que si ya que tiene muchos datos agrupados, exceptuando por aquellos que son muy lejanos,</p>
+<p>Realizamos una eliminicacion de variables puesto a que esas variables solo nos indican un solo valor fijo igual a la cantidad de datos que tiene la base de datos, por lo que no es de utilidad.</p>
+<p>A su vez eliminamos la variable ID_MUNICIPIO, ya que esta nos sepraria los datos de una forma que no queremos y ya que se repiten los mismos datos al pasar de Entidad, en realidad no estariamos comparando nada.</p>
+<p>Ahora realizaremos una limpieza en la base de datos para que sea mas facil de manejar, como a su vez sea mejor para el modelo.</p>
+<p><strong>Huecos y Outliers</strong></p>
+<pre><code>datos.dropna(inplace=True)
+datos_sin_huecos = datos.dropna(inplace=True, axis=1)
+print("\nVerificando si se elimino algun hueco:", datos.shape)
+
+q1=datos.MOTO_PARTICULAR.quantile(0.25)
+q3=datos.MOTO_PARTICULAR.quantile(0.75)
+iqr=q3-q1
+li=q1-(3*iqr)
+ls=q3+(3*iqr)
+out=np.where((datos.AUTO_PARTICULAR&#x3C;=li) | (datos.AUTO_PARTICULAR>=ls))[0]
+print(datos.iloc[out,:])
+datos = datos.drop(out).reset_index(drop=True)
+</code></pre>
+<pre><code>Verificando si se elimino algun hueco: (2478, 13)
+      ID_ENTIDAD  AUTO_OFICIAL  AUTO_PUBLICO  AUTO_PARTICULAR  \
+0              1           452          4741           368872   
+1              1             0            36             6870   
+2              1             1           168            13988   
+4              1            24           243            41830   
+5              1             7           192            10518   
+...          ...           ...           ...              ...   
+2461          32             5            46            10535   
+2467          32             3           129             7569   
+2468          32             5            29             6717   
+2474          32             4            53             8426   
+2475          32           196           563            60126   
+
+      CAM_PAS_OFICIAL  CAM_PAS_PUBLICO  CAM_PAS_PARTICULAR  CYC_CARGA_OFICIAL  \
+0                   5             2497                 619                557   
+1                   0                2                  18                  6   
+2                   0                7                  10                 18   
+4                   0               46                  90                 35   
+5                   0               13                  21                  2   
+...               ...              ...                 ...                ...   
+2461                2               10                  47                 30   
+2467                0               12                  10                 17   
+2468                0                2                   7                 17   
+2474                0                6                  10                  8   
+2475                7              300                 173                952   
+
+      CYC_CARGA_PUBLICO  CYC_CARGA_PARTICULAR  MOTO_OFICIAL  MOTO_DE_ALQUILER  \
+0                  3599                112480           299                 0   
+1                    20                  5689             2                 0   
+2                     4                 13383             9                 0   
+4                   180                 17078            24                 0   
+5                    19                  5434             4                 0   
+...                 ...                   ...           ...               ...   
+2461                 19                 11499             8                 0   
+2467                 28                  6203             4                 0   
+2468                 21                  7540             0                 0   
+2474                 29                  7995             7                 0   
+2475                133                 23198           164                 0   
+
+      MOTO_PARTICULAR  
+0               89105  
+1                6199  
+2                3776  
+4               12852  
+5                3772  
+...               ...  
+2461             1708  
+2467             1689  
+2468              976  
+2474             1567  
+2475             7807  
+
+[572 rows x 13 columns]
+</code></pre>
+<p>Con el comando dropna() se eliminaran todos los valores en las filas y columnas que no contengan datos o que tengan NA. Para confirmar si habia huecos imprimiremos nuevamente las dimensiones de la base dato y nos damos cuenta de que sigue estando igual.</p>
+<p>Realizamos el metodo TUKEY para asi poder eliminar los valores atipicos que se presentan en la variable AUTO_PARTICULAR para que al momento de predecir o analisar esta variable sea mejor.</p>
+<p><strong>Variables Cualitativas</strong></p>
+<pre><code>datos_encoded=datos.copy()
+
+if datos_encoded["ID_ENTIDAD"].dtype == 'bool':
+    datos_encoded["ID_ENTIDAD"] = datos_encoded["ID_ENTIDAD"].astype(int)
+else:
+    datos_encoded["ID_ENTIDAD"] = datos_encoded["ID_ENTIDAD"].astype("category")
+
+datos_encoded = pd.get_dummies(datos_encoded, columns=["ID_ENTIDAD"], drop_first=True)
+
+datos_encoded = datos_encoded.copy()
+for col in datos_encoded.columns:
+    if datos_encoded[col].dtype=='bool':
+        datos_encoded[col]=datos_encoded[col].astype(int)
+numeric_cols=datos_encoded.select_dtypes(include=np.number)
+
+print("Shape final:", numeric_cols.shape)
+print(numeric_cols.head())
+</code></pre>
+<pre><code>Shape final: (1906, 40)
+   AUTO_OFICIAL  AUTO_PUBLICO  AUTO_PARTICULAR  CAM_PAS_OFICIAL  \
+0             2            21             2700                0   
+1             3            50             1819                0   
+2             0            43             3513                0   
+3             2            45             4293                0   
+4             0             5             3318                0   
+
+   CAM_PAS_PUBLICO  CAM_PAS_PARTICULAR  CYC_CARGA_OFICIAL  CYC_CARGA_PUBLICO  \
+0                0                   6                  7                  0   
+1                1                   4                  2                  0   
+2                0                   6                  9                  1   
+3                0                   4                  4                  0   
+4               73                   4                  0                 56   
+
+   CYC_CARGA_PARTICULAR  MOTO_OFICIAL  ...  ID_ENTIDAD_22  ID_ENTIDAD_24  \
+0                  1795             0  ...              0              0   
+1                  1838             0  ...              0              0   
+2                  3016             0  ...              0              0   
+3                  3323             0  ...              0              0   
+4                  1467             0  ...              0              0   
+
+   ID_ENTIDAD_25  ID_ENTIDAD_26  ID_ENTIDAD_27  ID_ENTIDAD_28  ID_ENTIDAD_29  \
+0              0              0              0              0              0   
+1              0              0              0              0              0   
+2              0              0              0              0              0   
+3              0              0              0              0              0   
+4              0              0              0              0              0   
+
+   ID_ENTIDAD_30  ID_ENTIDAD_31  ID_ENTIDAD_32  
+0              0              0              0  
+1              0              0              0  
+2              0              0              0  
+3              0              0              0  
+4              0              0              0  
+
+[5 rows x 40 columns]
+</code></pre>
+<p>Convertiremos la variable ID_ENTIDAD a booleanos ya que esta analizando el diccionario es en realidad una variable cualitativa aunque tenga numeros enteros. Por esto despues de convertir a booleanos crearemos una nueva variable para cada numero cualitativo. Despues pasaremos estos valores booleanos a 0 y 1 para su mejor uso</p>
+<p><strong>Colinealidad</strong></p>
+<pre><code>import seaborn as sns
+
+#Heatmap con las variables dummy ID_ENTIDAD
+cor = abs(np.corrcoef(numeric_cols, rowvar=False))
+np.fill_diagonal(cor, 0)
+i, j = np.unravel_index(cor.argmax(), cor.shape)
+print(i, j)
+print(cor[i, j])
+
+plt.figure(figsize=(10, 8))
+sns.heatmap(
+    cor, annot=True, xticklabels=numeric_cols.columns, yticklabels=numeric_cols.columns,
+)
+plt.show()
+
+#Heatmap sin la variable ID_ENTIDAD
+cor = abs(np.corrcoef(datos, rowvar=False))
+np.fill_diagonal(cor, 0)
+i, j = np.unravel_index(cor.argmax(), cor.shape)
+print(i, j)
+print(cor[i, j])
+
+plt.figure(figsize=(10, 8))
+sns.heatmap(
+    cor, annot=True, xticklabels=datos.columns, yticklabels=datos.columns,
+)
+plt.show()
+</code></pre>
+<pre><code>2 8
+0.8460044291371867
+
+
+
+</code></pre>
+<p><img src="output_7_1.png" alt="png"></p>
+<pre><code>3 9
+0.8460044291371867
+
+
+
+</code></pre>
+<p><img src="output_7_3.png" alt="png"></p>
+<p>Realizamos 2 heatmaps ya que el primero no se puede analizar claramente y a su vez que no proporciona informacion relevante puesto que la mayoria de esas correlaciones son extremadamente bajas</p>
+<p>A su vez en el segundo heatmap vemos que hay coorealaciones bastantes grandes , la cual es la variable CYC_CARGA_PARTICULAR , pero en este caso no la eliminaremos porque su eliminacion podria ocacionar estragos en la efectividad de las regresiones, ya que su colinealidad con las otras variables es importante para mas adelante.</p>
+<p><strong>Interacción</strong></p>
+<pre><code>from sklearn.model_selection import train_test_split
+X_train, X_test, Y_train, Y_test = train_test_split(numeric_cols.drop("AUTO_PARTICULAR",axis=1),
+                                                    numeric_cols.AUTO_PARTICULAR,
+                                                    train_size = 0.8,
+                                                    random_state=32)
+
+X_train.insert(2,"Moto partiular y Carga Oficial",X_train.MOTO_DE_ALQUILER*X_train.CYC_CARGA_OFICIAL)
+X_test.insert(2,"Moto partiular y Carga Oficial",X_test.MOTO_DE_ALQUILER*X_test.CYC_CARGA_OFICIAL)
+X_train.insert(4,"Moto oficial y Autobuses publicos",X_train.MOTO_OFICIAL*X_train.CAM_PAS_PUBLICO)
+X_test.insert(4,"Moto oficial y Autobuses publicos",X_test.MOTO_OFICIAL*X_test.CAM_PAS_PUBLICO)
+X_train.head()
+X_test.head()
+</code></pre>
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<pre><code>&#x3C;script>
+  const buttonEl =
+    document.querySelector('#df-90fdf17d-3d94-487d-9743-241ba4a4808d button.colab-df-convert');
+  buttonEl.style.display =
+    google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+  async function convertToInteractive(key) {
+    const element = document.querySelector('#df-90fdf17d-3d94-487d-9743-241ba4a4808d');
+    const dataTable =
+      await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                [key], {});
+    if (!dataTable) return;
+
+    const docLinkHtml = 'Like what you see? Visit the ' +
+      '&#x3C;a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook&#x3C;/a>'
+      + ' to learn more about interactive tables.';
+    element.innerHTML = '';
+    dataTable['output_type'] = 'display_data';
+    await google.colab.output.renderOutput(dataTable, element);
+    const docLink = document.createElement('div');
+    docLink.innerHTML = docLinkHtml;
+    element.appendChild(docLink);
+  }
+&#x3C;/script>
+</code></pre>
+<pre><code>&#x3C;div id="df-f78748e2-fd20-4aa8-b9d8-ce229bacc69c">
+  &#x3C;button class="colab-df-quickchart" onclick="quickchart('df-f78748e2-fd20-4aa8-b9d8-ce229bacc69c')"
+            title="Suggest charts"
+            style="display:none;">
+</code></pre>
+<p>&#x3C;svg xmlns="<a href="http://www.w3.org/2000/svg">http://www.w3.org/2000/svg</a>" height="24px"viewBox="0 0 24 24"
+width="24px">
+
+
+
+
+</p>
+<pre><code>  &#x3C;script>
+    async function quickchart(key) {
+      const quickchartButtonEl =
+        document.querySelector('#' + key + ' button');
+      quickchartButtonEl.disabled = true;  // To prevent multiple clicks.
+      quickchartButtonEl.classList.add('colab-df-spinner');
+      try {
+        const charts = await google.colab.kernel.invokeFunction(
+            'suggestCharts', [key], {});
+      } catch (error) {
+        console.error('Error during call to suggestCharts:', error);
+      }
+      quickchartButtonEl.classList.remove('colab-df-spinner');
+      quickchartButtonEl.classList.add('colab-df-quickchart-complete');
+    }
+    (() => {
+      let quickchartButtonEl =
+        document.querySelector('#df-f78748e2-fd20-4aa8-b9d8-ce229bacc69c button');
+      quickchartButtonEl.style.display =
+        google.colab.kernel.accessAllowed ? 'block' : 'none';
+    })();
+  &#x3C;/script>
+&#x3C;/div>
+
+&#x3C;/div>
+</code></pre>
+<p>Para que el analisis de estos datos no este variando constantemente usamos el random state y la establecemos en 32 para que nos porporcione algunos de los valores que realmente son los mejores para el sistema y asi evitar una fuga en los datos.</p>
+<p>A su vez realizaremos la división entre datos de prueba y entrenamiento de la variable AUTO_PARTICULAR</p>
+<p>A su vez realizaremos la interaccion de dos variables que tienen poca colinearidad como se vio en el heatmap para generar un mejor desempeño.</p>
+<p><strong>Seleccion Mixta</strong></p>
+<pre><code>from mlxtend.feature_selection import SequentialFeatureSelector as SFS
+from sklearn.linear_model import LinearRegression
+
+estimator=LinearRegression()
+
+sfsForward=SFS(estimator,
+                  k_features=(3,10),
+                  forward=True,
+                  scoring='r2',
+                  cv=10)
+modeloF=sfsForward.fit(X_train, Y_train)
+selected_variablesF=list(modeloF.k_feature_names_)
+
+
+from sklearn.metrics import r2_score
+x_train_selectedF=X_train[selected_variablesF]
+x_test_selectedF=X_test[selected_variablesF]
+
+
+sfsFBward =SFS(estimator,
+                  k_features=(3,10),
+                  forward=False,
+                  scoring='r2',
+                  cv=10)
+ModeloFB=sfsFBward.fit(x_train_selectedF,Y_train)
+
+print("Variables seleccionadas:\n", ModeloFB.k_feature_names_)
+
+X_train_selectedFB=X_train[list(ModeloFB.k_feature_names_)]
+X_test_selectedFB=X_test[list(ModeloFB.k_feature_names_)]
+estimator.fit(X_train_selectedFB,Y_train)
+
+</code></pre>
+<pre><code>Variables seleccionadas:
+ ('AUTO_PUBLICO', 'CAM_PAS_PUBLICO', 'CYC_CARGA_PARTICULAR', 'MOTO_PARTICULAR', 'ID_ENTIDAD_13', 'ID_ENTIDAD_15', 'ID_ENTIDAD_17', 'ID_ENTIDAD_18', 'ID_ENTIDAD_24', 'ID_ENTIDAD_29')
+</code></pre>
+<p>Generamos una seleccion de caracteristicas mixta para tener una mejor eficacia, ya que aunque tiene varias variables no son suficientes para que esta parte del programa se relantice demasiado y ademas esto genera grandes resultados.</p>
+<p>A su vez estas carecterisitcas seleccionados las añidaremos a la base de datos nueva para realizar predicciones mas adelante.</p>
+<p><strong>Linear y No linear de una variable</strong></p>
+<pre><code>import statsmodels.api as sm
+Y_AP=datos.AUTO_PARTICULAR
+X_MP=datos.MOTO_PARTICULAR
+X_MP=sm.add_constant(X_MP)
+model = sm.OLS(Y_AP,X_MP)
+results = model.fit()
+print(results.summary())
+
+from sklearn.neighbors import KNeighborsRegressor as KNN
+mknn = KNN(n_neighbors=5).fit(X_MP,Y_AP)
+yHat_KNN = mknn.predict(X_MP)
+print(mknn.get_params())
+</code></pre>
+<pre><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:        AUTO_PARTICULAR   R-squared:                       0.389
+Model:                            OLS   Adj. R-squared:                  0.389
+Method:                 Least Squares   F-statistic:                     1213.
+Date:                Mon, 08 Sep 2025   Prob (F-statistic):          4.06e-206
+Time:                        08:55:02   Log-Likelihood:                -16217.
+No. Observations:                1906   AIC:                         3.244e+04
+Df Residuals:                    1904   BIC:                         3.245e+04
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+===================================================================================
+                      coef    std err          t      P>|t|      [0.025      0.975]
+-----------------------------------------------------------------------------------
+const             775.3876     31.106     24.927      0.000     714.383     836.393
+MOTO_PARTICULAR     1.0421      0.030     34.835      0.000       0.983       1.101
+==============================================================================
+Omnibus:                      505.475   Durbin-Watson:                   1.304
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):             1645.183
+Skew:                           1.311   Prob(JB):                         0.00
+Kurtosis:                       6.721   Cond. No.                     1.18e+03
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 1.18e+03. This might indicate that there are
+strong multicollinearity or other numerical problems.
+{'algorithm': 'auto', 'leaf_size': 30, 'metric': 'minkowski', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'uniform'}
+</code></pre>
+<p>Se realiza un OLS para sacar todos los datos posibles al solo analizar la variable AUTO_PARTICULAR vs MOTO_PARTICULAR donde se puede ver que la variable MOTO_PARTICULAR tiene una alta significancia en AUTO_PARTICULAR ya que es menor a 0.05.</p>
+<p>A su vez el R2 y el R2 ajustada nos indican un 0.39 de que la linealidad pasara por los datos y al ser solo el analisis de 2 variables dentro de una base de datos de 41 esta linealidad es bastante alta los cual nos deja ver que tienen alta significancia y vamos por un buen camino.</p>
+<p><strong>Error y Linealidad</strong></p>
+<pre><code>import statsmodels.api as sm
+
+modelTotal = sm.OLS(Y_train,sm.add_constant(X_train_selectedFB))
+results = modelTotal.fit()
+print(results.summary())
+print("\nP-values:\n", results.pvalues)
+
+yHat_lin_selectedFB=estimator.predict(X_test_selectedFB)
+
+from sklearn.neighbors import KNeighborsRegressor as KNN
+mknn = KNN(n_neighbors=5).fit(X_test_selectedFB,Y_test)
+yHat_KNN = mknn.predict(X_test_selectedFB)
+print(mknn.get_params())
+
+RSS_lin = sum((list(Y_test)-yHat_lin_selectedFB)**2)
+RSE_lin = np.sqrt(RSS_lin/(len(Y_test)-1))
+
+RSS_KNN = sum((list(Y_test)-yHat_KNN)**2)
+RSE_KNN = np.sqrt(RSS_KNN/(len(Y_test)-1))
+print("Comparacion del RSS\n RSS lineal: ", RSS_lin, "\n RSS KNN: ", RSS_KNN)
+print("\nComparacion del RSE\n RSE lineal: ", RSE_lin, "\n RSE KNN: ", RSE_KNN)
+
+from sklearn.metrics import r2_score
+r2_lin = r2_score(Y_test, yHat_lin_selectedFB)
+r2_KNN = r2_score(Y_test, yHat_KNN)
+print("\nComparacion del R2\n R2 lineal: ", r2_lin, "\n R2 KNN: ", r2_KNN)
+</code></pre>
+<pre><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:        AUTO_PARTICULAR   R-squared:                       0.844
+Model:                            OLS   Adj. R-squared:                  0.843
+Method:                 Least Squares   F-statistic:                     815.9
+Date:                Mon, 08 Sep 2025   Prob (F-statistic):               0.00
+Time:                        08:55:02   Log-Likelihood:                -11951.
+No. Observations:                1524   AIC:                         2.392e+04
+Df Residuals:                    1513   BIC:                         2.398e+04
+Df Model:                          10                                         
+Covariance Type:            nonrobust                                         
+========================================================================================
+                           coef    std err          t      P>|t|      [0.025      0.975]
+----------------------------------------------------------------------------------------
+const                   51.1246     21.477      2.380      0.017       8.997      93.252
+AUTO_PUBLICO             2.1109      0.229      9.234      0.000       1.663       2.559
+CAM_PAS_PUBLICO          6.7747      1.225      5.529      0.000       4.371       9.178
+CYC_CARGA_PARTICULAR     0.8040      0.015     54.249      0.000       0.775       0.833
+MOTO_PARTICULAR          0.3483      0.021     16.605      0.000       0.307       0.389
+ID_ENTIDAD_13          669.5005     84.681      7.906      0.000     503.395     835.606
+ID_ENTIDAD_15         1492.0281    102.952     14.492      0.000    1290.084    1693.973
+ID_ENTIDAD_17          775.1106    131.032      5.915      0.000     518.087    1032.134
+ID_ENTIDAD_18        -1051.1788    189.910     -5.535      0.000   -1423.693    -678.664
+ID_ENTIDAD_24         -781.9315    103.845     -7.530      0.000    -985.627    -578.236
+ID_ENTIDAD_29         1706.2173    117.400     14.533      0.000    1475.934    1936.501
+==============================================================================
+Omnibus:                      462.251   Durbin-Watson:                   1.941
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):             3349.605
+Skew:                           1.217   Prob(JB):                         0.00
+Kurtosis:                       9.843   Cond. No.                     2.31e+04
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 2.31e+04. This might indicate that there are
+strong multicollinearity or other numerical problems.
+
+P-values:
+ const                   1.741408e-02
+AUTO_PUBLICO            8.498755e-20
+CAM_PAS_PUBLICO         3.783238e-08
+CYC_CARGA_PARTICULAR    0.000000e+00
+MOTO_PARTICULAR         5.180451e-57
+ID_ENTIDAD_13           5.078341e-15
+ID_ENTIDAD_15           1.146970e-44
+ID_ENTIDAD_17           4.086000e-09
+ID_ENTIDAD_18           3.659992e-08
+ID_ENTIDAD_24           8.689888e-14
+ID_ENTIDAD_29           6.786460e-45
+dtype: float64
+{'algorithm': 'auto', 'leaf_size': 30, 'metric': 'minkowski', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'uniform'}
+Comparacion del RSS
+ RSS lineal:  126493531.37699278 
+ RSS KNN:  115370014.52000001
+
+Comparacion del RSE
+ RSE lineal:  576.1978994774155 
+ RSE KNN:  550.280325888876
+
+Comparacion del R2
+ R2 lineal:  0.8402404143300133 
+ R2 KNN:  0.8542892627171292
+</code></pre>
+<p>Ahora volveremos a hacer algo parecido pero ahora si con todas las variables y las carecteristicas seleccionadas previamente, donde imprimiremos el RSS y el RSE para ver que metodo entre lineal multiple o KNN es mejo. En la cual nos damos cuenta que estas son menores al momento de tener errores.</p>
+<p>De la misma manera imprimiremos la R2 para saber que modelo tiene mejor linealidad y vemos que el KNN sale mas alto por lo que en este caso tambien es mejor este modelos.</p>
+<p>Asi que con estas metricas podemos llegar a concluir que el metodo de KNN es mejor param estos datos y no el de regresion lineal multiple como teniamos predicho.</p>
+<p><strong>Analisis de los datos</strong></p>
+<pre><code>plt.scatter(Y_test, yHat_lin_selectedFB, alpha=0.5)
+plt.plot(Y_test, yHat_KNN, 'r.', label='KNN', alpha=0.5)
+plt.xlabel('Real')
+plt.ylabel('Predicho')
+plt.title('Autos Particulares, Reales vs Predichos')
+plt.legend()
+plt.show()
+</code></pre>
+<p><img src="output_17_0.png" alt="png"></p>
+<p>Podemos notar que entre mas se empiecen a dispersar los datos el KNN empezara a falla y los valores mas lejanos no los alcanzara a abarcar.</p>
+<p>Estos nos indica que en realidad el modelo tiene errores al momento de que haya mas autos de los que esta acostumbrado el modelo KNN.</p>
+<p>Tambien observamos que entre mas datos de autos reales halla, se podran predecir de mejor manera y estos sufren de casi una linealidad.</p>
